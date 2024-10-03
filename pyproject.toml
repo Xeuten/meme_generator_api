@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "meme_generator_api"
+version = "0.1.0"
+description = "Meme Generator API"
+authors = ["Xeuten <xeuten@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12.7"
+django = "^5.1.1"
+djangorestframework = "^3.15.2"
+djangorestframework-simplejwt = "^5.3.1"
+
+[tool.poetry.dev-dependencies]
+ruff = "^0.6.8"
+black = "^24.8.0"
+pre-commit = "^3.8.0"
+poethepoet = "^0.29.0"
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+exclude = ["*/migrations/"]
+select = ["F", "E", "W", "I"]
+ignore = ["E501"]
+
+[tool.poe.tasks]
+git-hooks = "pre-commit install -t pre-commit -t commit-msg -f"
+dev = "python manage.py runserver"
+lint = "ruff --fix ."
+black = "black ."
+makemigrations = "python manage.py makemigrations"
+migrate = "python manage.py migrate"
+syncdb = ["make-migrations", "migrate"]
+createsuperuser = "python manage.py createsuperuser"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
