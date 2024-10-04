@@ -31,7 +31,7 @@ ignore = ["E501"]
 
 [tool.poe.tasks]
 git-hooks = "pre-commit install -t pre-commit -t commit-msg -f"
-dev = "python manage.py runserver"
+dev = "python manage.py runserver 0.0.0.0:8080"
 lint = "ruff check --fix ."
 black = "black ."
 makemigrations = "python manage.py makemigrations"

@@ -1,14 +1,19 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db.models import (
     CASCADE,
+    BooleanField,
     CharField,
     DateTimeField,
+    EmailField,
     IntegerChoices,
     IntegerField,
     Model,
     URLField,
 )
 from django.db.models.fields.related import ForeignKey
+from django.utils.translation import gettext_lazy as _
+
+from api.managers import UserManager
 
 
 class Score(IntegerChoices):
@@ -26,38 +31,56 @@ class TimeStampedModel(Model):
         abstract = True
 
 
-class MemeTemplate(Model):
-    name = CharField("Name", max_length=100)
-    image_url = URLField("Image URL")
-    default_top_text = CharField(max_length=100, blank=True)
-    default_bottom_text = CharField(max_length=100, blank=True)
+class User(AbstractBaseUser, PermissionsMixin):
+    email = EmailField(verbose_name=_("Email"), unique=True)
+    is_staff = BooleanField(verbose_name=_("Is staff"), default=False)
+
+    USERNAME_FIELD = "email"
+
+    objects = UserManager()
+
+    def __str__(self):
+        return self.email
 
     class Meta:
-        verbose_name = "Meme template"
-        verbose_name_plural = "Meme templates"
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
+
+
+class MemeTemplate(Model):
+    name = CharField(_("Name"), max_length=100)
+    image_url = URLField(_("Image URL"))
+    default_top_text = CharField(_("Default top text"), max_length=100, blank=True)
+    default_bottom_text = CharField(
+        _("Default bottom text"), max_length=100, blank=True
+    )
+
+    class Meta:
+        verbose_name = _("Meme template")
+        verbose_name_plural = _("Meme templates")
 
 
 class Meme(TimeStampedModel):
-    template = ForeignKey(MemeTemplate, verbose_name="Template", on_delete=CASCADE)
-    top_text = CharField("Top text", max_length=100)
-    bottom_text = CharField("Bottom text", max_length=100)
-    created_by = ForeignKey(User, verbose_name="Created by", on_delete=CASCADE)
+    template = ForeignKey(MemeTemplate, verbose_name=_("Template"), on_delete=CASCADE)
+    top_text = CharField(_("Top text"), max_length=100)
+    bottom_text = CharField(_("Bottom text"), max_length=100)
+    created_by = ForeignKey(User, verbose_name=_("Created by"), on_delete=CASCADE)
 
     class Meta:
-        verbose_name = "Meme"
-        verbose_name_plural = "Memes"
+        verbose_name = _("Meme")
+        verbose_name_plural = _("Memes")
 
 
 class Rating(TimeStampedModel):
     meme = ForeignKey(
-        Meme, verbose_name="Meme", on_delete=CASCADE, related_name="ratings"
+        Meme, verbose_name=_("Meme"), on_delete=CASCADE, related_name="ratings"
     )
     user = ForeignKey(
-        User, verbose_name="User", on_delete=CASCADE, related_name="ratings"
+        User, verbose_name=_("User"), on_delete=CASCADE, related_name="ratings"
     )
-    score = IntegerField("Score", choices=Score)
+    score = IntegerField(_("Score"), choices=Score)
 
     class Meta:
-        verbose_name = "Rating"
-        verbose_name_plural = "Ratings"
+        verbose_name = _("Rating")
+        verbose_name_plural = _("Ratings")
         unique_together = ("meme", "user")
