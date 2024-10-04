@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: meme_generator_api
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: POSTGRES
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:POSTGRES@db:5432/meme_generator_api
+      DJANGO_SUPERUSER_EMAIL: root@example.com
+      DJANGO_SUPERUSER_PASSWORD: adminpassword
+
+volumes:
+  postgres_data:
