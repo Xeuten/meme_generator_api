@@ -1,5 +1,6 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.db import IntegrityError
+from django.db.models import Manager
 
 from core.exceptions import BadRequestError
 
@@ -21,3 +22,8 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         return self.create_user(email, password, **extra_fields)
+
+
+class MemeManager(Manager):
+    def all(self):
+        return super().select_related("created_by", "template").all()

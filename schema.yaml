@@ -26,7 +26,8 @@ paths:
         '201':
           description: User registered successfully
         '400':
-          description: Bad request
+          description: Email already exists or passwords do not match
+      security: []
   /api/token/:
     post:
       summary: Obtain token pair
@@ -48,7 +49,8 @@ paths:
         '400':
           description: Bad request
         '401':
-          description: Unauthorized
+          description: Invalid credentials
+      security: []
   /api/token/refresh/:
     post:
       summary: Refresh an access token
@@ -70,6 +72,7 @@ paths:
           description: Bad request
         '401':
           description: Unauthorized
+      security: []
   /api/templates/:
     get:
       summary: List all meme templates
@@ -106,11 +109,11 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Meme'
+                $ref: '#/components/schemas/MemesPaginatedResponse'
         '401':
           description: Unauthorized
+        '404':
+          description: Page not found
     post:
       summary: Create a new meme
       tags:
@@ -127,7 +130,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Meme'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+        '400':
+          description: Incorrect template id
+        '401':
+          description: Unauthorized
   /api/memes/{id}/:
     get:
       summary: Retrieve a specific meme
@@ -146,6 +157,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Meme'
+        '401':
+          description: Unauthorized
   /api/memes/{id}/rate/:
     post:
       summary: Rate a meme
@@ -170,11 +183,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rating'
+        '401':
+          description: Unauthorized
   /api/memes/random/:
     get:
       summary: Get a random meme
       tags:
-        - Meme
+        - api
       responses:
         '200':
           description: A random meme
@@ -182,11 +197,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Meme'
+        '401':
+          description: Unauthorized
   /api/memes/top/:
     get:
       summary: Get top 10 rated memes
       tags:
-        - Meme
+        - api
       responses:
         '200':
           description: Top 10 memes
@@ -196,6 +213,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Meme'
+        '401':
+          description: Unauthorized
 
 components:
   schemas:
@@ -265,40 +284,77 @@ components:
       properties:
         id:
           type: integer
+          example: 1
         name:
           type: string
+          example: test template
         image_url:
           type: string
           format: url
+          example: 'https://example.com/image.jpg'
         default_top_text:
           type: string
+          example: Default top text
         default_bottom_text:
           type: string
+          example: Default bottom text
+    ShortUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: test@example.com
+    MemesPaginatedResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 3
+        next:
+          type: string
+          format: url
+        previous:
+          type: string
+          format: url
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Meme'
     Meme:
       type: object
       properties:
         id:
           type: integer
+          example: 1
         template:
           $ref: '#/components/schemas/MemeTemplate'
         top_text:
           type: string
+          example: Top text
         bottom_text:
           type: string
+          example: Bottom text
         created_by:
-          $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/ShortUser'
         created_at:
           type: string
           format: date-time
+          example: '2024-03-15T10:00:00'
     MemeCreate:
       type: object
       properties:
         template_id:
           type: integer
+          example: 1
         top_text:
           type: string
+          example: Top text
         bottom_text:
           type: string
+          example: Bottom text
     Rating:
       type: object
       properties:
@@ -330,3 +386,9 @@ components:
             - 3
             - 4
             - 5
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

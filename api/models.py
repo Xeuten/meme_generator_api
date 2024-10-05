@@ -13,7 +13,7 @@ from django.db.models import (
 from django.db.models.fields.related import ForeignKey
 from django.utils.translation import gettext_lazy as _
 
-from api.managers import UserManager
+from api.managers import MemeManager, UserManager
 
 
 class Score(IntegerChoices):
@@ -65,6 +65,8 @@ class Meme(TimeStampedModel):
     top_text = CharField(_("Top text"), max_length=100)
     bottom_text = CharField(_("Bottom text"), max_length=100)
     created_by = ForeignKey(User, verbose_name=_("Created by"), on_delete=CASCADE)
+
+    objects = MemeManager()
 
     class Meta:
         verbose_name = _("Meme")

@@ -1,8 +1,8 @@
-from rest_framework.fields import CharField, EmailField
+from rest_framework.fields import CharField, EmailField, IntegerField
 from rest_framework.serializers import ModelSerializer, Serializer
 from typing_extensions import Any
 
-from api.models import Meme, MemeTemplate
+from api.models import Meme, MemeTemplate, User
 from core.exceptions import BadRequestError
 
 
@@ -18,6 +18,15 @@ class RegisterSerializer(Serializer):
         return attrs
 
 
+class ShortUserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "email",
+        )
+
+
 class MemeTemplateSerializer(ModelSerializer):
     class Meta:
         model = MemeTemplate
@@ -25,6 +34,15 @@ class MemeTemplateSerializer(ModelSerializer):
 
 
 class MemeSerializer(ModelSerializer):
+    template = MemeTemplateSerializer()
+    created_by = ShortUserSerializer()
+
     class Meta:
         model = Meme
         fields = "__all__"
+
+
+class CreateMemeSerializer(Serializer):
+    template_id = IntegerField()
+    top_text = CharField(required=False)
+    bottom_text = CharField(required=False)

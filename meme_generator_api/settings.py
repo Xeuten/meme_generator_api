@@ -135,6 +135,7 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "core.exception_handler.common_exception_handler",
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "PAGE_SIZE": 2,
+    "DATE_INPUT_FORMATS": ("iso-8601",),
 }
 
 AUTH_USER_MODEL = "api.User"

@@ -4,9 +4,15 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from api.dto import MemeDTO
 from api.models import Meme, MemeTemplate
-from api.serializers import MemeSerializer, MemeTemplateSerializer, RegisterSerializer
-from api.services import RegisterService
+from api.serializers import (
+    CreateMemeSerializer,
+    MemeSerializer,
+    MemeTemplateSerializer,
+    RegisterSerializer,
+)
+from api.services import CreateMemeService, RegisterService
 
 
 class RegisterView(GenericAPIView):
@@ -28,7 +34,16 @@ class ListTemplatesView(ListAPIView):
     queryset = MemeTemplate.objects.all()
 
 
-class ListMemesView(ListAPIView):
+class MemesView(ListAPIView):
     serializer_class = MemeSerializer
     queryset = Meme.objects.all()
     pagination_class = PageNumberPagination
+
+    def post(self, request, *args, **kwargs):
+        serializer = CreateMemeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        meme_id = CreateMemeService(
+            MemeDTO(created_by_id=request.user.id, **serializer.validated_data)
+        ).execute()
+        return Response(data={"id": meme_id}, status=status.HTTP_201_CREATED)
