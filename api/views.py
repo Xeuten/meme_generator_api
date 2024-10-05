@@ -1,10 +1,11 @@
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.models import MemeTemplate
-from api.serializers import MemeTemplateSerializer, RegisterSerializer
+from api.models import Meme, MemeTemplate
+from api.serializers import MemeSerializer, MemeTemplateSerializer, RegisterSerializer
 from api.services import RegisterService
 
 
@@ -25,3 +26,9 @@ class RegisterView(GenericAPIView):
 class ListTemplatesView(ListAPIView):
     serializer_class = MemeTemplateSerializer
     queryset = MemeTemplate.objects.all()
+
+
+class ListMemesView(ListAPIView):
+    serializer_class = MemeSerializer
+    queryset = Meme.objects.all()
+    pagination_class = PageNumberPagination

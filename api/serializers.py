@@ -2,7 +2,7 @@ from rest_framework.fields import CharField, EmailField
 from rest_framework.serializers import ModelSerializer, Serializer
 from typing_extensions import Any
 
-from api.models import MemeTemplate
+from api.models import Meme, MemeTemplate
 from core.exceptions import BadRequestError
 
 
@@ -21,4 +21,10 @@ class RegisterSerializer(Serializer):
 class MemeTemplateSerializer(ModelSerializer):
     class Meta:
         model = MemeTemplate
+        fields = "__all__"
+
+
+class MemeSerializer(ModelSerializer):
+    class Meta:
+        model = Meme
         fields = "__all__"

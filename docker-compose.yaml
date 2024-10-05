@@ -16,10 +16,8 @@ services:
       - "8080:8080"
     depends_on:
       - db
-    environment:
-      DATABASE_URL: postgres://postgres:POSTGRES@db:5432/meme_generator_api
-      DJANGO_SUPERUSER_EMAIL: root@example.com
-      DJANGO_SUPERUSER_PASSWORD: adminpassword
+    env_file:
+      - .env
 
   swagger-ui:
     image: swaggerapi/swagger-ui
