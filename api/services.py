@@ -4,7 +4,6 @@ from django.db.transaction import atomic
 
 from api.dto import MemeDTO
 from api.models import Meme, MemeTemplate, User
-from core.exceptions import NotFoundError
 
 
 class RegisterService:
@@ -24,10 +23,7 @@ class CreateMemeService:
         self._meme_info = meme_info
 
     def _check_template(self) -> MemeTemplate:
-        template = MemeTemplate.objects.filter(id=self._meme_info.template_id).first()
-        if not template:
-            raise NotFoundError()
-        return template
+        return MemeTemplate.objects.get_template_or_404(self._meme_info.template_id)
 
     def _ensure_texts(self, template: MemeTemplate) -> None:
         if not self._meme_info.top_text:
@@ -43,3 +39,14 @@ class CreateMemeService:
             template = self._check_template()
             self._ensure_texts(template)
             return self._create_meme()
+
+
+class MemeService:
+    def __init__(self, meme_id: int):
+        self._meme_id = meme_id
+
+    def _get_meme(self) -> Meme:
+        return Meme.objects.get_meme_or_404(meme_id=self._meme_id, perform_joins=True)
+
+    def execute(self) -> Meme:
+        return self._get_meme()

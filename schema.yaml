@@ -150,6 +150,7 @@ paths:
           required: true
           schema:
             type: integer
+            example: 1
       responses:
         '200':
           description: Details of a specific meme
@@ -159,6 +160,8 @@ paths:
                 $ref: '#/components/schemas/Meme'
         '401':
           description: Unauthorized
+        '404':
+          description: Meme not found
   /api/memes/{id}/rate/:
     post:
       summary: Rate a meme
@@ -242,10 +245,10 @@ components:
       properties:
         email:
           type: string
-          example: test@example.com
+          example: root@example.com
         password:
           type: string
-          example: Ll123123&&
+          example: adminpassword
     TokenPair:
       required:
         - access

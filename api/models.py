@@ -13,7 +13,7 @@ from django.db.models import (
 from django.db.models.fields.related import ForeignKey
 from django.utils.translation import gettext_lazy as _
 
-from api.managers import MemeManager, UserManager
+from api.managers import MemeManager, MemeTemplateManager, UserManager
 
 
 class Score(IntegerChoices):
@@ -54,6 +54,8 @@ class MemeTemplate(Model):
     default_bottom_text = CharField(
         _("Default bottom text"), max_length=100, blank=True
     )
+
+    objects = MemeTemplateManager()
 
     class Meta:
         verbose_name = _("Meme template")

@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -12,7 +12,7 @@ from api.serializers import (
     MemeTemplateSerializer,
     RegisterSerializer,
 )
-from api.services import CreateMemeService, RegisterService
+from api.services import CreateMemeService, MemeService, RegisterService
 
 
 class RegisterView(GenericAPIView):
@@ -47,3 +47,10 @@ class MemesView(ListAPIView):
             MemeDTO(created_by_id=request.user.id, **serializer.validated_data)
         ).execute()
         return Response(data={"id": meme_id}, status=status.HTTP_201_CREATED)
+
+
+class MemeView(RetrieveAPIView):
+    serializer_class = MemeSerializer
+
+    def get_object(self):
+        return MemeService(self.kwargs["id"]).execute()
