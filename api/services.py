@@ -2,8 +2,8 @@ from dataclasses import asdict
 
 from django.db.transaction import atomic
 
-from api.dto import MemeDTO
-from api.models import Meme, MemeTemplate, User
+from api.dto import MemeDTO, RateMemeDTO
+from api.models import Meme, MemeTemplate, Rating, User
 
 
 class RegisterService:
@@ -50,3 +50,24 @@ class MemeService:
 
     def execute(self) -> Meme:
         return self._get_meme()
+
+
+class RateMemeService:
+    def __init__(self, rate_meme_info: RateMemeDTO):
+        self._rate_meme_info = rate_meme_info
+
+    def _check_meme(self) -> None:
+        Meme.objects.get_meme_or_404(meme_id=self._rate_meme_info.meme_id)
+
+    def _update_or_create_rating(self) -> int:
+        rating, _ = Rating.objects.update_or_create(
+            meme_id=self._rate_meme_info.meme_id,
+            user_id=self._rate_meme_info.user_id,
+            defaults={"score": self._rate_meme_info.score},
+        )
+        return rating.id
+
+    def execute(self) -> int:
+        with atomic():
+            self._check_meme()
+            return self._update_or_create_rating()

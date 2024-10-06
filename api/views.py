@@ -4,15 +4,21 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.dto import MemeDTO
+from api.dto import MemeDTO, RateMemeDTO
 from api.models import Meme, MemeTemplate
 from api.serializers import (
     CreateMemeSerializer,
     MemeSerializer,
     MemeTemplateSerializer,
+    RateMemeSerializer,
     RegisterSerializer,
 )
-from api.services import CreateMemeService, MemeService, RegisterService
+from api.services import (
+    CreateMemeService,
+    MemeService,
+    RateMemeService,
+    RegisterService,
+)
 
 
 class RegisterView(GenericAPIView):
@@ -46,7 +52,7 @@ class MemesView(ListAPIView):
         meme_id = CreateMemeService(
             MemeDTO(created_by_id=request.user.id, **serializer.validated_data)
         ).execute()
-        return Response(data={"id": meme_id}, status=status.HTTP_201_CREATED)
+        return Response(data={"meme_id": meme_id}, status=status.HTTP_201_CREATED)
 
 
 class MemeView(RetrieveAPIView):
@@ -54,3 +60,20 @@ class MemeView(RetrieveAPIView):
 
     def get_object(self):
         return MemeService(self.kwargs["id"]).execute()
+
+
+class RateMemeView(GenericAPIView):
+    serializer_class = RateMemeSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        rating_id = RateMemeService(
+            RateMemeDTO(
+                meme_id=kwargs["id"],
+                user_id=request.user.id,
+                **serializer.validated_data
+            )
+        ).execute()
+        return Response(data={"rating_id": rating_id}, status=status.HTTP_201_CREATED)

@@ -8,3 +8,10 @@ class MemeDTO:
     created_by_id: int
     top_text: Optional[str] = None
     bottom_text: Optional[str] = None
+
+
+@dataclass
+class RateMemeDTO:
+    meme_id: int
+    user_id: int
+    score: int

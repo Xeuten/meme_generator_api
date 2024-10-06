@@ -1,8 +1,8 @@
-from rest_framework.fields import CharField, EmailField, IntegerField
+from rest_framework.fields import CharField, ChoiceField, EmailField, IntegerField
 from rest_framework.serializers import ModelSerializer, Serializer
 from typing_extensions import Any
 
-from api.models import Meme, MemeTemplate, User
+from api.models import Meme, MemeTemplate, Score, User
 from core.exceptions import BadRequestError
 
 
@@ -46,3 +46,7 @@ class CreateMemeSerializer(Serializer):
     template_id = IntegerField()
     top_text = CharField(required=False)
     bottom_text = CharField(required=False)
+
+
+class RateMemeSerializer(Serializer):
+    score = ChoiceField(choices=Score)
