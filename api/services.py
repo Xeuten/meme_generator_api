@@ -67,6 +67,11 @@ class RateMemeService:
         Meme.objects.get_meme_or_404(meme_id=self._rate_meme_info.meme_id)
 
     def _update_or_create_rating(self) -> int:
+        """
+        This method is used to update the rating if the user has already rated the
+        meme, otherwise it creates a new rating. We use the update_or_create method
+        provided by Django perform the operation efficiently.
+        """
         rating, _ = Rating.objects.update_or_create(
             meme_id=self._rate_meme_info.meme_id,
             user_id=self._rate_meme_info.user_id,
@@ -87,6 +92,12 @@ class SurpriseMeMemeService:
         self._bottom_text = random.choice(BOTTOM_TEXTS)
 
     def _read_template_file(self) -> tuple[MemeTemplate, BytesIO]:
+        """
+        This method is used to get a random meme template from the database and read
+        the image file from the URL. If the image file from the template's URL is not
+        found, we iterate over the templates until we find a valid image file. If no
+        valid image file is found, we raise a NotFoundError.
+        """
         templates = list(MemeTemplate.objects.get_random_order_templates())
         for template in templates:
             response = requests.get(template.image_url)

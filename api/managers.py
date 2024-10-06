@@ -27,6 +27,11 @@ class UserManager(BaseUserManager):
 
 class MemeManager(Manager):
     def all(self):
+        """
+        This method is used to perform joins with the created_by and template tables,
+        which is useful when we want to return the created_by and template information
+        without making additional queries.
+        """
         return super().select_related("created_by", "template").all()
 
     def get_meme_or_404(self, meme_id: int, perform_joins: bool = False):
@@ -36,6 +41,13 @@ class MemeManager(Manager):
         return meme
 
     def get_random_meme(self):
+        """
+        This method is used to get a random meme from the database in efficient way.
+        It uses a feature that is available in PostgreSQL, which is the TABLESAMPLE
+        clause. The clause is used to get a random sample of the table, which is
+        useful when we want to get a random row from a large table. If the table is
+        small, we use regular random ordering.
+        """
         table = self.model._meta.db_table
         large_table_query = f"SELECT * FROM {table} TABLESAMPLE SYSTEM (1) LIMIT 1"
         try:
@@ -58,6 +70,11 @@ class MemeManager(Manager):
             raise NotFoundError()
 
     def get_top_memes(self):
+        """
+        This method is used to get the top 10 memes based on the average score of their
+        ratings. We annotate the queryset with the average score of the ratings and
+        then order the queryset by the average score in descending order.
+        """
         return (
             self.all()
             .annotate(

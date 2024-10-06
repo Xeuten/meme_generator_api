@@ -37,6 +37,10 @@ def get_width_height(text: str, draw: ImageDraw, font: ImageFont) -> tuple[int, 
 
 
 def construct_meme_image(io: BytesIO, top_text: str, bottom_text: str) -> ContentFile:
+    """
+    This function constructs a meme image with the given top and bottom text via the
+    Pillow library.
+    """
     img = Image.open(io)
     draw = ImageDraw.Draw(img)
     font = ImageFont.load_default()
