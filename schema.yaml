@@ -203,9 +203,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Meme'
+                $ref: '#/components/schemas/ShortMeme'
         '401':
           description: Unauthorized
+        '404':
+          description: No memes found
   /api/memes/top/:
     get:
       summary: Get top 10 rated memes
@@ -350,6 +352,28 @@ components:
           type: string
           format: date-time
           example: '2024-03-15T10:00:00'
+    ShortMeme:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+          template:
+            type: integer
+            example: 1
+          top_text:
+            type: string
+            example: Top text
+          bottom_text:
+            type: string
+            example: Bottom text
+          created_by:
+            type: integer
+            example: 1
+          created_at:
+            type: string
+            format: date-time
+            example: '2024-03-15T10:00:00'
     MemeCreate:
       type: object
       properties:

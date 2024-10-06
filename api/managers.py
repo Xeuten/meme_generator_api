@@ -34,6 +34,28 @@ class MemeManager(Manager):
             raise NotFoundError()
         return meme
 
+    def get_random_meme(self):
+        table = self.model._meta.db_table
+        large_table_query = f"SELECT * FROM {table} TABLESAMPLE SYSTEM (1) LIMIT 1"
+        try:
+            return self.raw(
+                f"""
+                    (
+                        {large_table_query}
+                    )
+                    UNION ALL
+                    (
+                        SELECT * FROM {table}
+                        WHERE NOT EXISTS ({large_table_query})
+                        ORDER BY RANDOM()
+                        LIMIT 1
+                    )
+                    LIMIT 1
+                """
+            )[0]
+        except IndexError:
+            raise NotFoundError()
+
 
 class MemeTemplateManager(Manager):
     def get_template_or_404(self, template_id: int):

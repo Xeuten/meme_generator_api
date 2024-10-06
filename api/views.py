@@ -12,6 +12,7 @@ from api.serializers import (
     MemeTemplateSerializer,
     RateMemeSerializer,
     RegisterSerializer,
+    ShortMemeSerializer,
 )
 from api.services import (
     CreateMemeService,
@@ -77,3 +78,10 @@ class RateMemeView(GenericAPIView):
             )
         ).execute()
         return Response(data={"rating_id": rating_id}, status=status.HTTP_201_CREATED)
+
+
+class RandomMemeView(RetrieveAPIView):
+    serializer_class = ShortMemeSerializer
+
+    def get_object(self):
+        return Meme.objects.get_random_meme()

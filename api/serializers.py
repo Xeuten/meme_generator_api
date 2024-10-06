@@ -42,6 +42,12 @@ class MemeSerializer(ModelSerializer):
         fields = "__all__"
 
 
+class ShortMemeSerializer(ModelSerializer):
+    class Meta:
+        model = Meme
+        fields = "__all__"
+
+
 class CreateMemeSerializer(Serializer):
     template_id = IntegerField()
     top_text = CharField(required=False)
