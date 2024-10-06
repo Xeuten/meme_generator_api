@@ -111,6 +111,7 @@ class SurpriseMeMemeService:
         return {"url": meme.image.url}
 
     def execute(self) -> dict[str, str]:
-        template, template_io = self._read_template_file()
-        meme_image = self._construct_meme_image(template_io)
-        return self._create_meme(template, meme_image)
+        with atomic():
+            template, template_io = self._read_template_file()
+            meme_image = self._construct_meme_image(template_io)
+            return self._create_meme(template, meme_image)
