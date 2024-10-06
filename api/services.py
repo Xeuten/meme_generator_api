@@ -1,9 +1,16 @@
+import random
+import uuid
 from dataclasses import asdict
+from io import BytesIO
 
+import requests
+from django.core.files.base import ContentFile
 from django.db.transaction import atomic
 
 from api.dto import MemeDTO, RateMemeDTO
 from api.models import Meme, MemeTemplate, Rating, User
+from api.utils import BOTTOM_TEXTS, TOP_TEXTS, construct_meme_image
+from core.exceptions import NotFoundError
 
 
 class RegisterService:
@@ -71,3 +78,39 @@ class RateMemeService:
         with atomic():
             self._check_meme()
             return self._update_or_create_rating()
+
+
+class SurpriseMeMemeService:
+    def __init__(self, user_id: int):
+        self._user_id = user_id
+        self._top_text = random.choice(TOP_TEXTS)
+        self._bottom_text = random.choice(BOTTOM_TEXTS)
+
+    def _read_template_file(self) -> tuple[MemeTemplate, BytesIO]:
+        templates = list(MemeTemplate.objects.get_random_order_templates())
+        for template in templates:
+            response = requests.get(template.image_url)
+            if response.status_code == 200:
+                return template, BytesIO(response.content)
+        raise NotFoundError()
+
+    def _construct_meme_image(self, meme_template_io: BytesIO) -> ContentFile:
+        return construct_meme_image(meme_template_io, self._top_text, self._bottom_text)
+
+    def _create_meme(
+        self, template: MemeTemplate, meme_image: ContentFile
+    ) -> dict[str, str]:
+        meme = Meme(
+            template=template,
+            created_by_id=self._user_id,
+            top_text=self._top_text,
+            bottom_text=self._bottom_text,
+        )
+        file_name = f"{template.name}_{uuid.uuid4()}.jpeg"
+        meme.image.save(file_name, meme_image)
+        return {"url": meme.image.url}
+
+    def execute(self) -> dict[str, str]:
+        template, template_io = self._read_template_file()
+        meme_image = self._construct_meme_image(template_io)
+        return self._create_meme(template, meme_image)

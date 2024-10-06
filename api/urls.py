@@ -8,6 +8,7 @@ from api.views import (
     RandomMemeView,
     RateMemeView,
     RegisterView,
+    SurpriseMeMemeView,
     TopMemesView,
 )
 
@@ -21,4 +22,5 @@ urlpatterns = [
     path("memes/<int:id>/rate/", RateMemeView.as_view(), name="rate_meme"),
     path("memes/random/", RandomMemeView.as_view(), name="random_meme"),
     path("memes/top/", TopMemesView.as_view(), name="top_memes"),
+    path("memes/surprise-me/", SurpriseMeMemeView.as_view(), name="surprise_me_meme"),
 ]

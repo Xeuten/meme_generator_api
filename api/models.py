@@ -5,6 +5,7 @@ from django.db.models import (
     CharField,
     DateTimeField,
     EmailField,
+    ImageField,
     IntegerChoices,
     IntegerField,
     Model,
@@ -67,6 +68,8 @@ class Meme(TimeStampedModel):
     top_text = CharField(_("Top text"), max_length=100)
     bottom_text = CharField(_("Bottom text"), max_length=100)
     created_by = ForeignKey(User, verbose_name=_("Created by"), on_delete=CASCADE)
+
+    image = ImageField(_("Image"), upload_to="memes/", blank=True, null=True)
 
     objects = MemeManager()
 

@@ -14,12 +14,14 @@ from api.serializers import (
     RateMemeSerializer,
     RegisterSerializer,
     ShortMemeSerializer,
+    SurpriseMemeSerializer,
 )
 from api.services import (
     CreateMemeService,
     MemeService,
     RateMemeService,
     RegisterService,
+    SurpriseMeMemeService,
 )
 
 
@@ -91,3 +93,10 @@ class RandomMemeView(RetrieveAPIView):
 class TopMemesView(ListAPIView):
     serializer_class = RatedMemeSerializer
     queryset = Meme.objects.get_top_memes()
+
+
+class SurpriseMeMemeView(RetrieveAPIView):
+    serializer_class = SurpriseMemeSerializer
+
+    def get_object(self):
+        return SurpriseMeMemeService(user_id=self.request.user.id).execute()

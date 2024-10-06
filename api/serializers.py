@@ -4,6 +4,7 @@ from rest_framework.fields import (
     DecimalField,
     EmailField,
     IntegerField,
+    URLField,
 )
 from rest_framework.serializers import ModelSerializer, Serializer
 from typing_extensions import Any
@@ -72,3 +73,7 @@ class CreateMemeSerializer(Serializer):
 
 class RateMemeSerializer(Serializer):
     score = ChoiceField(choices=Score)
+
+
+class SurpriseMemeSerializer(Serializer):
+    url = URLField()

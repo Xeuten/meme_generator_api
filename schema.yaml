@@ -228,6 +228,26 @@ paths:
                   $ref: '#/components/schemas/RatedMeme'
         '401':
           description: Unauthorized
+  /api/memes/surprise-me/:
+    get:
+      summary: Get a URL to a random generated meme
+      tags:
+        - api
+      responses:
+        '200':
+          description: URL to a random generated meme
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: 'https://example.com/image.jpg'
+        '401':
+          description: Unauthorized
+        '404':
+          description: No meme templates found
 
 components:
   schemas:

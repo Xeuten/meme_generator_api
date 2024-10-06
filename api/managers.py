@@ -74,3 +74,6 @@ class MemeTemplateManager(Manager):
         if not (template := self.all().filter(id=template_id).first()):
             raise NotFoundError()
         return template
+
+    def get_random_order_templates(self):
+        return self.all().order_by("?")
