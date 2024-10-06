@@ -10,6 +10,7 @@ from api.serializers import (
     CreateMemeSerializer,
     MemeSerializer,
     MemeTemplateSerializer,
+    RatedMemeSerializer,
     RateMemeSerializer,
     RegisterSerializer,
     ShortMemeSerializer,
@@ -85,3 +86,8 @@ class RandomMemeView(RetrieveAPIView):
 
     def get_object(self):
         return Meme.objects.get_random_meme()
+
+
+class TopMemesView(ListAPIView):
+    serializer_class = RatedMemeSerializer
+    queryset = Meme.objects.get_top_memes()

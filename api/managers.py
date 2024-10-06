@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.db import IntegrityError
-from django.db.models import Manager
+from django.db.models import Avg, FloatField, Manager, Value
+from django.db.models.functions.comparison import Coalesce
 
 from core.exceptions import BadRequestError, NotFoundError
 
@@ -55,6 +56,17 @@ class MemeManager(Manager):
             )[0]
         except IndexError:
             raise NotFoundError()
+
+    def get_top_memes(self):
+        return (
+            self.all()
+            .annotate(
+                average_score=Coalesce(
+                    Avg("ratings__score"), Value(0), output_field=FloatField()
+                )
+            )
+            .order_by("-average_score")[:10]
+        )
 
 
 class MemeTemplateManager(Manager):

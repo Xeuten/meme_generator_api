@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -139,3 +140,12 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = "api.User"
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        hours=int(config("ACCESS_TOKEN_LIFETIME_HOURS", 1))
+    ),
+    "REFRESH_TOKEN_LIFETIME": timedelta(
+        days=int(config("REFRESH_TOKEN_LIFETIME_DAYS", 365))
+    ),
+}

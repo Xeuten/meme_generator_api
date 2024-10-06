@@ -1,4 +1,10 @@
-from rest_framework.fields import CharField, ChoiceField, EmailField, IntegerField
+from rest_framework.fields import (
+    CharField,
+    ChoiceField,
+    DecimalField,
+    EmailField,
+    IntegerField,
+)
 from rest_framework.serializers import ModelSerializer, Serializer
 from typing_extensions import Any
 
@@ -40,6 +46,16 @@ class MemeSerializer(ModelSerializer):
     class Meta:
         model = Meme
         fields = "__all__"
+
+
+class RatedMemeSerializer(ModelSerializer):
+    template = MemeTemplateSerializer()
+    created_by = ShortUserSerializer()
+    average_score = DecimalField(max_digits=3, decimal_places=2)
+
+    class Meta:
+        model = Meme
+        fields = ("template", "top_text", "bottom_text", "created_by", "average_score")
 
 
 class ShortMemeSerializer(ModelSerializer):

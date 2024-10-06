@@ -132,7 +132,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
+                  meme_id:
                     type: integer
                     example: 1
         '400':
@@ -185,7 +185,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Rating'
+                type: object
+                properties:
+                  rating_id:
+                    type: integer
+                    example: 1
         '400':
           description: Incorrect score
         '401':
@@ -221,7 +225,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Meme'
+                  $ref: '#/components/schemas/RatedMeme'
         '401':
           description: Unauthorized
 
@@ -352,6 +356,29 @@ components:
           type: string
           format: date-time
           example: '2024-03-15T10:00:00'
+    RatedMeme:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        template:
+          $ref: '#/components/schemas/MemeTemplate'
+        top_text:
+          type: string
+          example: Top text
+        bottom_text:
+          type: string
+          example: Bottom text
+        created_by:
+          $ref: '#/components/schemas/ShortUser'
+        created_at:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:00:00'
+        average_score:
+          type: number
+          example: 4.55
     ShortMeme:
         type: object
         properties:
@@ -386,26 +413,6 @@ components:
         bottom_text:
           type: string
           example: Bottom text
-    Rating:
-      type: object
-      properties:
-        id:
-          type: integer
-        meme:
-          $ref: '#/components/schemas/Meme'
-        user:
-          $ref: '#/components/schemas/User'
-        score:
-          type: integer
-          enum:
-            - 1
-            - 2
-            - 3
-            - 4
-            - 5
-        created_at:
-          type: string
-          format: date-time
     RatingCreate:
       type: object
       properties:
