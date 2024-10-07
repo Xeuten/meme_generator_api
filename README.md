@@ -18,3 +18,6 @@ To access the API documentation, run the project and go to the following URL:
 ```
 http://localhost:8000
 ```
+
+# Notes
+The surprise-me endpoint will work correctly only if there are meme templates with valid URLs in the database.
