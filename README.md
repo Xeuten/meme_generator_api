@@ -20,7 +20,6 @@ http://localhost:8000
 ```
 
 # Notes
-- The surprise-me endpoint will work correctly only if there are meme templates with valid URLs in the database. Also, it should be noted that the endpoint works rather slowly and in real application, it should be optimized.
+- The surprise-me endpoint will work correctly only if there are meme templates with valid URLs in the database. Also, it should be noted that the endpoint works rather slowly and in real application it should be optimized (via websockets or message queues).
 - Tests are launched automatically before running the server, so if the server is running, the tests are successfully passed.
-- I committed the .env file to allow anyone to run the project without any additional configurations for demonstration purposes only. In a real-world scenario, the file should be kept secret.
-- 
+- I've committed the .env file to allow anyone to run the project without any additional configurations for demonstration purposes only. In a real-world scenario, the file should be kept secret.
