@@ -6,7 +6,6 @@ from django.db.models import (
     DateTimeField,
     EmailField,
     ImageField,
-    IntegerChoices,
     IntegerField,
     Model,
     URLField,
@@ -14,15 +13,8 @@ from django.db.models import (
 from django.db.models.fields.related import ForeignKey
 from django.utils.translation import gettext_lazy as _
 
+from api.enums import Score
 from api.managers import MemeManager, MemeTemplateManager, UserManager
-
-
-class Score(IntegerChoices):
-    ONE = 1
-    TWO = 2
-    THREE = 3
-    FOUR = 4
-    FIVE = 5
 
 
 class TimeStampedModel(Model):
@@ -69,6 +61,9 @@ class Meme(TimeStampedModel):
     bottom_text = CharField(_("Bottom text"), max_length=100)
     created_by = ForeignKey(User, verbose_name=_("Created by"), on_delete=CASCADE)
 
+    # This field is used to store the image of the meme. In a real-world application,
+    # we would store the image in a cloud storage service like AWS S3, and store the
+    # URL of the image in the database.
     image = ImageField(_("Image"), upload_to="memes/", blank=True, null=True)
 
     objects = MemeManager()

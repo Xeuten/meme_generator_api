@@ -6,10 +6,11 @@ from io import BytesIO
 import requests
 from django.core.files.base import ContentFile
 from django.db.transaction import atomic
+from PIL import Image, ImageDraw, ImageFont
 
+from api.consts import BOTTOM_TEXTS, TOP_TEXTS
 from api.dto import MemeDTO, RateMemeDTO
 from api.models import Meme, MemeTemplate, Rating, User
-from api.utils import BOTTOM_TEXTS, TOP_TEXTS, construct_meme_image
 from core.exceptions import NotFoundError
 
 
@@ -26,26 +27,35 @@ class RegisterService:
 
 
 class CreateMemeService:
-    def __init__(self, meme_info: MemeDTO):
-        self._meme_info = meme_info
+    def __init__(self, meme_data: MemeDTO):
+        self._meme_data = meme_data
 
-    def _check_template(self) -> MemeTemplate:
-        return MemeTemplate.objects.get_template_or_404(self._meme_info.template_id)
+    def _get_full_meme_data(self) -> MemeDTO:
+        template = MemeTemplate.objects.get_template_or_404(self._meme_data.template_id)
+        top_text = (
+            self._meme_data.top_text
+            if self._meme_data.top_text
+            else template.default_top_text
+        )
+        bottom_text = (
+            self._meme_data.bottom_text
+            if self._meme_data.bottom_text
+            else template.default_bottom_text
+        )
+        return MemeDTO(
+            template_id=template.id,
+            created_by_id=self._meme_data.created_by_id,
+            top_text=top_text,
+            bottom_text=bottom_text,
+        )
 
-    def _ensure_texts(self, template: MemeTemplate) -> None:
-        if not self._meme_info.top_text:
-            self._meme_info.top_text = template.default_top_text
-        if not self._meme_info.bottom_text:
-            self._meme_info.bottom_text = template.default_bottom_text
-
-    def _create_meme(self) -> int:
-        return Meme.objects.create(**asdict(self._meme_info)).id
+    def _create_meme(self, full_meme_info: MemeDTO) -> int:
+        return Meme.objects.create(**asdict(full_meme_info)).id
 
     def execute(self) -> int:
         with atomic():
-            template = self._check_template()
-            self._ensure_texts(template)
-            return self._create_meme()
+            full_meme_info = self._get_full_meme_data()
+            return self._create_meme(full_meme_info)
 
 
 class MemeService:
@@ -53,7 +63,7 @@ class MemeService:
         self._meme_id = meme_id
 
     def _get_meme(self) -> Meme:
-        return Meme.objects.get_meme_or_404(meme_id=self._meme_id, perform_joins=True)
+        return Meme.objects.get_meme_with_joins_or_404(meme_id=self._meme_id)
 
     def execute(self) -> Meme:
         return self._get_meme()
@@ -105,8 +115,42 @@ class SurpriseMeMemeService:
                 return template, BytesIO(response.content)
         raise NotFoundError()
 
+    def _get_width_height(
+        self, text: str, draw: ImageDraw, font: ImageFont
+    ) -> tuple[int, int]:
+        left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
+        return abs(right - left), abs(bottom - top)
+
     def _construct_meme_image(self, meme_template_io: BytesIO) -> ContentFile:
-        return construct_meme_image(meme_template_io, self._top_text, self._bottom_text)
+        img = Image.open(meme_template_io)
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.load_default()
+
+        text_width, text_height = self._get_width_height(self._top_text, draw, font)
+        top_position = ((img.width - text_width) / 2, 0)
+        draw.text(
+            top_position,
+            self._top_text,
+            fill="white",
+            font=font,
+            stroke_width=2,
+            stroke_fill="black",
+        )
+
+        text_width, text_height = self._get_width_height(self._bottom_text, draw, font)
+        bottom_position = ((img.width - text_width) / 2, img.height - text_height)
+        draw.text(
+            bottom_position,
+            self._bottom_text,
+            fill="white",
+            font=font,
+            stroke_width=2,
+            stroke_fill="black",
+        )
+
+        meme_img_io = BytesIO()
+        img.save(meme_img_io, format="JPEG")
+        return ContentFile(meme_img_io.getvalue())
 
     def _create_meme(
         self, template: MemeTemplate, meme_image: ContentFile

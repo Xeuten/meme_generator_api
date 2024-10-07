@@ -46,7 +46,7 @@ class ListTemplatesView(ListAPIView):
 
 class MemesView(ListAPIView):
     serializer_class = MemeSerializer
-    queryset = Meme.objects.all()
+    queryset = Meme.objects.all_with_joins()
     pagination_class = PageNumberPagination
 
     def post(self, request, *args, **kwargs):

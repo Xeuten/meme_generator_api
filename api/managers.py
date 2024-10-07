@@ -26,17 +26,21 @@ class UserManager(BaseUserManager):
 
 
 class MemeManager(Manager):
-    def all(self):
+    def all_with_joins(self):
         """
         This method is used to perform joins with the created_by and template tables,
         which is useful when we want to return the created_by and template information
         without making additional queries.
         """
-        return super().select_related("created_by", "template").all()
+        return self.select_related("created_by", "template").all()
 
-    def get_meme_or_404(self, meme_id: int, perform_joins: bool = False):
-        queryset = self.all() if perform_joins else super().all()
-        if not (meme := queryset.filter(id=meme_id).first()):
+    def get_meme_with_joins_or_404(self, meme_id: int):
+        if not (meme := self.all_with_joins().filter(id=meme_id).first()):
+            raise NotFoundError()
+        return meme
+
+    def get_meme_or_404(self, meme_id: int):
+        if not (meme := self.filter(id=meme_id).first()):
             raise NotFoundError()
         return meme
 
@@ -76,7 +80,7 @@ class MemeManager(Manager):
         then order the queryset by the average score in descending order.
         """
         return (
-            self.all()
+            self.all_with_joins()
             .annotate(
                 average_score=Coalesce(
                     Avg("ratings__score"), Value(0), output_field=FloatField()
@@ -88,7 +92,7 @@ class MemeManager(Manager):
 
 class MemeTemplateManager(Manager):
     def get_template_or_404(self, template_id: int):
-        if not (template := self.all().filter(id=template_id).first()):
+        if not (template := self.filter(id=template_id).first()):
             raise NotFoundError()
         return template
 

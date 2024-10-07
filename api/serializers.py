@@ -9,7 +9,8 @@ from rest_framework.fields import (
 from rest_framework.serializers import ModelSerializer, Serializer
 from typing_extensions import Any
 
-from api.models import Meme, MemeTemplate, Score, User
+from api.enums import Score
+from api.models import Meme, MemeTemplate, User
 from core.exceptions import BadRequestError
 
 
