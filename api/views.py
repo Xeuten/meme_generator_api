@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from api.dto import MemeDTO, RateMemeDTO
-from api.models import Meme, MemeTemplate
+from api.models import Meme, MemeTemplate, User
 from api.serializers import (
     CreateMemeSerializer,
     MemeSerializer,
@@ -18,9 +18,7 @@ from api.serializers import (
 )
 from api.services import (
     CreateMemeService,
-    MemeService,
     RateMemeService,
-    RegisterService,
     SurpriseMeMemeService,
 )
 
@@ -33,9 +31,10 @@ class RegisterView(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        RegisterService(
-            serializer.validated_data["email"], serializer.validated_data["password_1"]
-        ).execute()
+        User.objects.create_user(
+            email=serializer.validated_data["email"],
+            password=serializer.validated_data["password_1"],
+        )
         return Response(status=status.HTTP_201_CREATED)
 
 
@@ -63,7 +62,7 @@ class MemeView(RetrieveAPIView):
     serializer_class = MemeSerializer
 
     def get_object(self):
-        return MemeService(self.kwargs["id"]).execute()
+        return Meme.objects.get_meme_with_joins_or_404(self.kwargs["id"])
 
 
 class RateMemeView(GenericAPIView):

@@ -10,20 +10,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 from api.consts import BOTTOM_TEXTS, TOP_TEXTS
 from api.dto import MemeDTO, RateMemeDTO
-from api.models import Meme, MemeTemplate, Rating, User
+from api.models import Meme, MemeTemplate, Rating
 from core.exceptions import NotFoundError
-
-
-class RegisterService:
-    def __init__(self, email: str, password: str):
-        self._email = email
-        self._password = password
-
-    def _create_user(self) -> None:
-        User.objects.create_user(email=self._email, password=self._password)
-
-    def execute(self) -> None:
-        self._create_user()
 
 
 class CreateMemeService:
@@ -56,17 +44,6 @@ class CreateMemeService:
         with atomic():
             full_meme_info = self._get_full_meme_data()
             return self._create_meme(full_meme_info)
-
-
-class MemeService:
-    def __init__(self, meme_id: int):
-        self._meme_id = meme_id
-
-    def _get_meme(self) -> Meme:
-        return Meme.objects.get_meme_with_joins_or_404(meme_id=self._meme_id)
-
-    def execute(self) -> Meme:
-        return self._get_meme()
 
 
 class RateMemeService:
