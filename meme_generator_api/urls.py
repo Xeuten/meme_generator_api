@@ -25,5 +25,7 @@ urlpatterns = [
     path("api/", include("api.urls")),
 ]
 
+# In a production environment, we would've used another approach to serve images for
+# the surprise-me feature.
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
