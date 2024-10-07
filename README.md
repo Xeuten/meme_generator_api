@@ -20,4 +20,5 @@ http://localhost:8000
 ```
 
 # Notes
-The surprise-me endpoint will work correctly only if there are meme templates with valid URLs in the database.
+- The surprise-me endpoint will work correctly only if there are meme templates with valid URLs in the database.
+- Tests are launched automatically before running the server, so if the server is running, the tests are successfully passed.
