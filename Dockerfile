@@ -16,5 +16,5 @@ ENTRYPOINT poetry run poe syncdb \
     user = User.objects.filter(email=os.environ['DJANGO_SUPERUSER_EMAIL']).first();\
     user.set_password(os.environ['DJANGO_SUPERUSER_PASSWORD']);\
     user.save();"\
-    && poetry run python manage.py test \
+    && poetry run python manage.py test --noinput \
     && poetry run poe dev

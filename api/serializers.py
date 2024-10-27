@@ -57,7 +57,15 @@ class RatedMemeSerializer(ModelSerializer):
 
     class Meta:
         model = Meme
-        fields = ("template", "top_text", "bottom_text", "created_by", "average_score")
+        fields = (
+            "id",
+            "created_at",
+            "template",
+            "top_text",
+            "bottom_text",
+            "created_by",
+            "average_score",
+        )
 
 
 class ShortMemeSerializer(ModelSerializer):
